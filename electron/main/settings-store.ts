@@ -8,8 +8,10 @@ export interface AppSettings {
   extensionsDir:    string
   dependenciesDir:  string
   hfToken?:         string
-  /** Default Automatic1111 API base URL (no trailing slash). */
-  sdWebuiBaseUrl?:  string
+  /** SD 1.5 WebUI API (launch_with_sd.bat, port 7860). */
+  sdWebuiBaseUrl?:     string
+  /** SDXL WebUI API (launch_with_sd_sdxl.bat, port 7861). */
+  sdWebuiSdxlBaseUrl?: string
 }
 
 function settingsPath(userData: string): string {
@@ -23,7 +25,8 @@ export function getSettings(userData: string): AppSettings {
     workflowsDir:     join(userData, 'workflows'),
     extensionsDir:    join(userData, 'extensions'),
     dependenciesDir:  join(userData, 'dependencies'),
-    sdWebuiBaseUrl:   'http://127.0.0.1:7860',
+    sdWebuiBaseUrl:     'http://127.0.0.1:7860',
+    sdWebuiSdxlBaseUrl: 'http://127.0.0.1:7861',
   }
 
   const file = settingsPath(userData)

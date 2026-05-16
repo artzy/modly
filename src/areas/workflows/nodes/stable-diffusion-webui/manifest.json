@@ -5,7 +5,7 @@
   "entry": "processor.js",
   "version": "1.0.0",
   "author": "Modly",
-  "description": "Generate images via a locally-running Automatic1111 SD WebUI instance (--api flag required). Tip: close SD WebUI before the 3D generation step to free ~12 GB VRAM.",
+  "description": "SD 1.5 and SDXL image generation via Automatic1111 API. Use launch_with_sd.bat (SD nodes) or launch_with_sd_sdxl.bat (SDXL nodes). Close WebUI before 3D generation on 12 GB VRAM.",
   "nodes": [
     {
       "id": "txt2img",
@@ -18,7 +18,7 @@
           "label": "API Base URL",
           "type": "string",
           "default": "",
-          "tooltip": "SD WebUI base URL (e.g. http://127.0.0.1:7860). Leave empty to use the app default. Remember to close SD WebUI before 3D generation to free ~12 GB VRAM."
+          "tooltip": "SD 1.5 WebUI URL (launch_with_sd.bat, port 7860). Leave empty for Settings default."
         },
         {
           "id": "prompt",
@@ -101,7 +101,7 @@
           "label": "API Base URL",
           "type": "string",
           "default": "",
-          "tooltip": "SD WebUI base URL (e.g. http://127.0.0.1:7860). Leave empty to use the app default. Remember to close SD WebUI before 3D generation to free ~12 GB VRAM."
+          "tooltip": "SD 1.5 WebUI URL (launch_with_sd.bat, port 7860). Leave empty for Settings default."
         },
         {
           "id": "prompt",
@@ -179,6 +179,211 @@
           "max": 1.0,
           "step": 0.05,
           "tooltip": "How much the image changes: 0 = identical, 1 = fully redrawn."
+        }
+      ]
+    },
+    {
+      "id": "sdxl_txt2img",
+      "name": "SDXL txt2img",
+      "input": "text",
+      "output": "image",
+      "params_schema": [
+        {
+          "id": "api_base_url",
+          "label": "API Base URL",
+          "type": "string",
+          "default": "",
+          "tooltip": "SDXL WebUI URL (launch_with_sd_sdxl.bat, port 7861). Leave empty for Settings SDXL default."
+        },
+        {
+          "id": "checkpoint",
+          "label": "Checkpoint",
+          "type": "string",
+          "default": "",
+          "tooltip": "Optional. Exact checkpoint filename in WebUI (override_settings). Empty = WebUI current model."
+        },
+        {
+          "id": "prompt",
+          "label": "Prompt",
+          "type": "string",
+          "default": "",
+          "tooltip": "Positive prompt. Text node input is prepended when connected."
+        },
+        {
+          "id": "negative_prompt",
+          "label": "Negative Prompt",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "id": "steps",
+          "label": "Steps",
+          "type": "int",
+          "default": 28,
+          "min": 1,
+          "max": 150
+        },
+        {
+          "id": "cfg_scale",
+          "label": "CFG Scale",
+          "type": "float",
+          "default": 6.0,
+          "min": 1.0,
+          "max": 30.0,
+          "step": 0.5
+        },
+        {
+          "id": "width",
+          "label": "Width",
+          "type": "int",
+          "default": 1024,
+          "min": 64,
+          "max": 2048,
+          "step": 64,
+          "tooltip": "1024 recommended; use 768 on 12 GB VRAM if needed."
+        },
+        {
+          "id": "height",
+          "label": "Height",
+          "type": "int",
+          "default": 1024,
+          "min": 64,
+          "max": 2048,
+          "step": 64
+        },
+        {
+          "id": "sampler_name",
+          "label": "Sampler",
+          "type": "string",
+          "default": "DPM++ 2M Karras"
+        },
+        {
+          "id": "seed",
+          "label": "Seed",
+          "type": "int",
+          "default": -1
+        },
+        {
+          "id": "sdxl_refiner_checkpoint",
+          "label": "Refiner checkpoint",
+          "type": "string",
+          "default": "",
+          "tooltip": "Optional SDXL refiner. Uses extra VRAM."
+        },
+        {
+          "id": "sdxl_refiner_switch_at",
+          "label": "Refiner switch at",
+          "type": "float",
+          "default": 0.8,
+          "min": 0.0,
+          "max": 1.0,
+          "step": 0.05
+        }
+      ]
+    },
+    {
+      "id": "sdxl_img2img",
+      "name": "SDXL img2img",
+      "input": "image",
+      "inputs": ["image", "text"],
+      "output": "image",
+      "params_schema": [
+        {
+          "id": "api_base_url",
+          "label": "API Base URL",
+          "type": "string",
+          "default": "",
+          "tooltip": "SDXL WebUI URL (launch_with_sd_sdxl.bat, port 7861). Leave empty for Settings SDXL default."
+        },
+        {
+          "id": "checkpoint",
+          "label": "Checkpoint",
+          "type": "string",
+          "default": "",
+          "tooltip": "Optional checkpoint filename for override_settings."
+        },
+        {
+          "id": "prompt",
+          "label": "Prompt",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "id": "negative_prompt",
+          "label": "Negative Prompt",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "id": "steps",
+          "label": "Steps",
+          "type": "int",
+          "default": 28,
+          "min": 1,
+          "max": 150
+        },
+        {
+          "id": "cfg_scale",
+          "label": "CFG Scale",
+          "type": "float",
+          "default": 6.0,
+          "min": 1.0,
+          "max": 30.0,
+          "step": 0.5
+        },
+        {
+          "id": "width",
+          "label": "Width",
+          "type": "int",
+          "default": 1024,
+          "min": 64,
+          "max": 2048,
+          "step": 64
+        },
+        {
+          "id": "height",
+          "label": "Height",
+          "type": "int",
+          "default": 1024,
+          "min": 64,
+          "max": 2048,
+          "step": 64
+        },
+        {
+          "id": "sampler_name",
+          "label": "Sampler",
+          "type": "string",
+          "default": "DPM++ 2M Karras"
+        },
+        {
+          "id": "seed",
+          "label": "Seed",
+          "type": "int",
+          "default": -1
+        },
+        {
+          "id": "denoising_strength",
+          "label": "Denoise",
+          "type": "float",
+          "default": 0.75,
+          "min": 0.0,
+          "max": 1.0,
+          "step": 0.05
+        },
+        {
+          "id": "sdxl_refiner_checkpoint",
+          "label": "Refiner checkpoint",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "id": "sdxl_refiner_switch_at",
+          "label": "Refiner switch at",
+          "type": "float",
+          "default": 0.8,
+          "min": 0.0,
+          "max": 1.0,
+          "step": 0.05
         }
       ]
     }

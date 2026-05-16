@@ -135,8 +135,8 @@ declare global {
         readScreenshotDataUrl: (filename: string) => Promise<string>
       }
       settings: {
-        get: () => Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; dependenciesDir?: string; hfToken?: string; sdWebuiBaseUrl?: string }>
-        set: (patch: { modelsDir?: string; workspaceDir?: string; workflowsDir?: string; extensionsDir?: string; dependenciesDir?: string; hfToken?: string; sdWebuiBaseUrl?: string }) => Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; dependenciesDir?: string; hfToken?: string; sdWebuiBaseUrl?: string }>
+        get: () => Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; dependenciesDir?: string; hfToken?: string; sdWebuiBaseUrl?: string; sdWebuiSdxlBaseUrl?: string }>
+        set: (patch: { modelsDir?: string; workspaceDir?: string; workflowsDir?: string; extensionsDir?: string; dependenciesDir?: string; hfToken?: string; sdWebuiBaseUrl?: string; sdWebuiSdxlBaseUrl?: string }) => Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; dependenciesDir?: string; hfToken?: string; sdWebuiBaseUrl?: string; sdWebuiSdxlBaseUrl?: string }>
       }
       cache: {
         clear: () => Promise<{ success: boolean; error?: string }>

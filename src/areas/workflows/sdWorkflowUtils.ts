@@ -3,7 +3,7 @@ import type { WorkflowExtension } from './mockExtensions'
 export const SD_EXTENSION_ID = 'stable-diffusion-webui'
 
 export const VRAM_SEQUENTIAL_HINT =
-  'Tip (12GB VRAM): Close Stable Diffusion WebUI or enable "Unload checkpoint after" before the 3D step.'
+  'Tip (12GB VRAM): Close SD / SDXL WebUI before the 3D step to free GPU memory.'
 
 export function sdExtensionRoot(extensionId: string | undefined): boolean {
   if (!extensionId) return false

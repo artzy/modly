@@ -368,7 +368,7 @@ export function setupIpcHandlers(pythonBridge: PythonBridge, getWindow: WindowGe
     return getSettings(app.getPath('userData'))
   })
 
-  ipcMain.handle('settings:set', async (_event, patch: { modelsDir?: string; workspaceDir?: string; extensionsDir?: string; workflowsDir?: string; hfToken?: string; sdWebuiBaseUrl?: string }) => {
+  ipcMain.handle('settings:set', async (_event, patch: { modelsDir?: string; workspaceDir?: string; extensionsDir?: string; workflowsDir?: string; hfToken?: string; sdWebuiBaseUrl?: string; sdWebuiSdxlBaseUrl?: string }) => {
     const updated = setSettings(app.getPath('userData'), patch)
     // Keep main-process env in sync so child processes spawned after token change inherit it
     if (patch.hfToken !== undefined) {
@@ -893,10 +893,13 @@ export function setupIpcHandlers(pythonBridge: PythonBridge, getWindow: WindowGe
 
       let runParams = params
       if (extensionId === 'stable-diffusion-webui') {
-        const { sdWebuiBaseUrl } = getSettings(userData)
-        const base = String(params.api_base_url ?? '').trim()
-          || String(sdWebuiBaseUrl ?? '').trim()
-          || 'http://127.0.0.1:7860'
+        const { sdWebuiBaseUrl, sdWebuiSdxlBaseUrl } = getSettings(userData)
+        const nodeId = input.nodeId ?? ''
+        const isSdxl = nodeId === 'sdxl_txt2img' || nodeId === 'sdxl_img2img'
+        const defaultBase = isSdxl
+          ? (sdWebuiSdxlBaseUrl ?? 'http://127.0.0.1:7861')
+          : (sdWebuiBaseUrl ?? 'http://127.0.0.1:7860')
+        const base = String(params.api_base_url ?? '').trim() || String(defaultBase).trim()
         runParams = { ...params, api_base_url: base }
       }
 

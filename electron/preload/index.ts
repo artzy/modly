@@ -56,9 +56,9 @@ contextBridge.exposeInMainWorld('electron', {
 
   // Settings
   settings: {
-    get: (): Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; hfToken?: string; sdWebuiBaseUrl?: string }> =>
+    get: (): Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; hfToken?: string; sdWebuiBaseUrl?: string; sdWebuiSdxlBaseUrl?: string }> =>
       ipcRenderer.invoke('settings:get'),
-    set: (patch: { modelsDir?: string; workspaceDir?: string; workflowsDir?: string; extensionsDir?: string; hfToken?: string; sdWebuiBaseUrl?: string }): Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; hfToken?: string; sdWebuiBaseUrl?: string }> =>
+    set: (patch: { modelsDir?: string; workspaceDir?: string; workflowsDir?: string; extensionsDir?: string; hfToken?: string; sdWebuiBaseUrl?: string; sdWebuiSdxlBaseUrl?: string }): Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; hfToken?: string; sdWebuiBaseUrl?: string; sdWebuiSdxlBaseUrl?: string }> =>
       ipcRenderer.invoke('settings:set', patch),
   },
 

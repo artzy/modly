@@ -7,7 +7,8 @@ set "SD_WEBUI_DIR=D:\Github\AI_IMAGE\stable-diffusion-webui"
 set "SD_PORT=7860"
 set "SD_API_URL=http://127.0.0.1:%SD_PORT%"
 
-echo  Modly + Stable Diffusion WebUI Launcher
+echo  Modly + SD 1.5 WebUI Launcher
+echo  (SD txt2img / SD img2img nodes — use launch_with_sd_sdxl.bat for SDXL)
 echo ========================================
 echo.
 
@@ -29,9 +30,9 @@ if not exist "%SD_WEBUI_DIR%\webui.bat" (
     exit /b 1
 )
 
-:: Start SD WebUI with API on SD_PORT (explicit --port avoids silent fallback to 7861)
-echo [1/3] Starting Stable Diffusion WebUI (API) on port %SD_PORT%...
-start "SD WebUI API" /D "%SD_WEBUI_DIR%" cmd /k "set COMMANDLINE_ARGS=--xformers --api --nowebui --port %SD_PORT% && call webui.bat"
+:: Start SD 1.5 WebUI with API on SD_PORT (do not run alongside launch_with_sd_sdxl.bat)
+echo [1/3] Starting SD 1.5 WebUI (API) on port %SD_PORT%...
+start "SD 1.5 WebUI API" /D "%SD_WEBUI_DIR%" cmd /k "set COMMANDLINE_ARGS=--xformers --api --nowebui --port %SD_PORT% && call webui.bat"
 
 :: Wait until /sdapi/v1/samplers responds on 7860-7865 (up to ~10 min)
 echo [2/3] Waiting for SD WebUI API (ports 7860-7865)...
@@ -48,7 +49,7 @@ for %%P in (7860 7861 7862 7863 7864 7865) do (
 set /a SD_TRIES+=1
 if !SD_TRIES! GEQ 120 (
     echo [WARN] SD WebUI API did not respond in time.
-    echo        Modly will start anyway. Set SD URL in Settings - Integrations.
+    echo        Modly will start anyway. Set SD 1.5 URL in Settings - Integrations.
     echo        Close SD WebUI before the 3D step if you have 12GB VRAM.
     goto modly_setup
 )
@@ -59,7 +60,7 @@ goto wait_sd
 echo        SD WebUI API is ready at !SD_API_URL!
 if not "!SD_PORT!"=="7860" (
     echo [NOTE] SD is not on default port 7860. In Modly: Settings - Integrations
-    echo        set SD WebUI Base URL to !SD_API_URL!
+    echo        set SD 1.5 WebUI Base URL to !SD_API_URL!
 )
 echo.
 
@@ -90,8 +91,9 @@ if not exist "out\" (
 
 :: Launch Modly
 echo [3/3] Launching Modly...
-echo        SD WebUI: !SD_API_URL!  (keep that window open during image generation)
-if not "!SD_PORT!"=="7860" echo        Set the same URL in Settings - Integrations.
+echo        SD 1.5 WebUI: !SD_API_URL!  (SD / SD img2img workflow nodes)
+if not "!SD_PORT!"=="7860" echo        Set SD 1.5 URL in Settings - Integrations.
+echo        SDXL: close this window, then run launch_with_sd_sdxl.bat
 echo        Tip: close SD WebUI before 3D model steps on 12GB VRAM.
 echo.
 call npm run preview

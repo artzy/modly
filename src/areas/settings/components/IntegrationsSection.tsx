@@ -3,15 +3,18 @@ import { Section, Card, Row } from '@shared/ui'
 
 export function IntegrationsSection(): JSX.Element {
   const [token,    setToken]    = useState('')
-  const [sdUrl,    setSdUrl]    = useState('http://127.0.0.1:7860')
-  const [visible,  setVisible]  = useState(false)
-  const [status,   setStatus]   = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const [sdStatus, setSdStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [sdUrl,     setSdUrl]     = useState('http://127.0.0.1:7860')
+  const [sdxlUrl,   setSdxlUrl]   = useState('http://127.0.0.1:7861')
+  const [visible,   setVisible]   = useState(false)
+  const [status,    setStatus]    = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [sdStatus,  setSdStatus]  = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [sdxlStatus, setSdxlStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
   useEffect(() => {
     window.electron.settings.get().then((s) => {
       setToken(s.hfToken ?? '')
       setSdUrl(s.sdWebuiBaseUrl ?? 'http://127.0.0.1:7860')
+      setSdxlUrl(s.sdWebuiSdxlBaseUrl ?? 'http://127.0.0.1:7861')
     })
   }, [])
 
@@ -36,6 +39,18 @@ export function IntegrationsSection(): JSX.Element {
     } catch {
       setSdStatus('error')
       setTimeout(() => setSdStatus('idle'), 3000)
+    }
+  }
+
+  async function handleSaveSdxlUrl() {
+    setSdxlStatus('saving')
+    try {
+      await window.electron.settings.set({ sdWebuiSdxlBaseUrl: sdxlUrl.trim() || 'http://127.0.0.1:7861' })
+      setSdxlStatus('saved')
+      setTimeout(() => setSdxlStatus('idle'), 2500)
+    } catch {
+      setSdxlStatus('error')
+      setTimeout(() => setSdxlStatus('idle'), 3000)
     }
   }
 
@@ -123,10 +138,10 @@ export function IntegrationsSection(): JSX.Element {
         </Card>
 
         <Card
-          title="Stable Diffusion WebUI"
-          description="Automatic1111 API base URL for workflow txt2img / img2img nodes. WebUI must be started with --api."
+          title="SD 1.5 WebUI"
+          description="SD txt2img / SD img2img nodes. Start with launch_with_sd.bat (port 7860)."
         >
-          <Row label="Base URL" description="Default used when a node leaves API URL empty.">
+          <Row label="Base URL" description="Used when SD nodes leave API URL empty.">
             <div className="flex items-center gap-2 w-full">
               <input
                 type="text"
@@ -149,6 +164,39 @@ export function IntegrationsSection(): JSX.Element {
                 {sdStatus === 'saving' ? 'Saving…' :
                  sdStatus === 'saved'  ? 'Saved'   :
                  sdStatus === 'error'  ? 'Failed'  :
+                 'Save'}
+              </button>
+            </div>
+          </Row>
+        </Card>
+
+        <Card
+          title="SDXL WebUI"
+          description="SDXL txt2img / SDXL img2img nodes. Close SD 1.5 WebUI first; use launch_with_sd_sdxl.bat (port 7861)."
+        >
+          <Row label="Base URL" description="Used when SDXL nodes leave API URL empty.">
+            <div className="flex items-center gap-2 w-full">
+              <input
+                type="text"
+                value={sdxlUrl}
+                onChange={(e) => { setSdxlUrl(e.target.value); setSdxlStatus('idle') }}
+                onKeyDown={(e) => e.key === 'Enter' && handleSaveSdxlUrl()}
+                placeholder="http://127.0.0.1:7861"
+                spellCheck={false}
+                className="flex-1 px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-700/60 text-xs font-mono text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
+              />
+              <button
+                onClick={handleSaveSdxlUrl}
+                disabled={sdxlStatus === 'saving'}
+                className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50 ${
+                  sdxlStatus === 'saved' ? 'bg-emerald-500/15 text-emerald-400' :
+                  sdxlStatus === 'error' ? 'bg-red-500/15 text-red-400' :
+                  'bg-accent/15 hover:bg-accent/25 text-accent-light'
+                }`}
+              >
+                {sdxlStatus === 'saving' ? 'Saving…' :
+                 sdxlStatus === 'saved'  ? 'Saved'   :
+                 sdxlStatus === 'error'  ? 'Failed'  :
                  'Save'}
               </button>
             </div>
