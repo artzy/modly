@@ -46,6 +46,29 @@ def main() -> None:
         error(f"mesh-remesher: input file not found: {input_path}")
         return
 
+    # trimesh cannot load raster images; workflows sometimes wire Image → Remesher by mistake
+    suffix = Path(input_path).suffix.lower()
+    image_ext = {
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp",
+        ".gif",
+        ".bmp",
+        ".tif",
+        ".tiff",
+        ".svg",
+        ".ico",
+        ".heic",
+        ".avif",
+    }
+    if suffix in image_ext:
+        error(
+            "mesh-remesher: input is a 2D image file; this node needs a 3D mesh (.glb, .obj, .stl, …). "
+            "Connect Load 3D Mesh or an AI model node that outputs a mesh — not an Image node."
+        )
+        return
+
     mode               = str(params.get("mode", "triangle"))
     target_edge_length = float(params.get("target_edge_length", 0.0))
 
