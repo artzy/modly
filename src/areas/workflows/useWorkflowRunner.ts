@@ -4,6 +4,7 @@ import { useAppStore } from '@shared/stores/appStore'
 import type { Workflow, WFNode, WFEdge } from '@shared/types/electron.d'
 import { getWorkflowExtension } from './mockExtensions'
 import type { WorkflowExtension } from './mockExtensions'
+import { vramHintIfNextIsModel, workflowOutputType } from './sdWorkflowUtils'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -234,12 +235,20 @@ export function useWorkflowRunner(allExtensions: WorkflowExtension[]) {
           if (!result.success) throw new Error(result.error ?? 'Process extension failed')
           nodeInputPath = result.result?.filePath ?? nodeInputPath
           nodeInputText = result.result?.text     ?? nodeInputText
-          setRunState((s) => ({ ...s, blockProgress: 100, blockStep: 'Done' }))
+          const vramHint = vramHintIfNextIsModel(
+            extId, execNodes, i, allExtensions,
+            (id) => getWorkflowExtension(id, allExtensions),
+          )
+          setRunState((s) => ({
+            ...s,
+            blockProgress: 100,
+            blockStep:     vramHint ?? 'Done',
+          }))
         }
 
         // Store this node's output so downstream nodes (including other branches) can read it.
         // Tag with outputType so multi-input nodes can route by type.
-        const outputType = ext?.output ?? (nodeInputPath ? 'mesh' : undefined)
+        const outputType = workflowOutputType(ext, nodeInputPath)
         nodeOutputs.set(node.id, { filePath: nodeInputPath, text: nodeInputText, outputType })
       }
 

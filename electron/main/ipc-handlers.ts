@@ -368,7 +368,7 @@ export function setupIpcHandlers(pythonBridge: PythonBridge, getWindow: WindowGe
     return getSettings(app.getPath('userData'))
   })
 
-  ipcMain.handle('settings:set', async (_event, patch: { modelsDir?: string; workspaceDir?: string; extensionsDir?: string; hfToken?: string }) => {
+  ipcMain.handle('settings:set', async (_event, patch: { modelsDir?: string; workspaceDir?: string; extensionsDir?: string; workflowsDir?: string; hfToken?: string; sdWebuiBaseUrl?: string }) => {
     const updated = setSettings(app.getPath('userData'), patch)
     // Keep main-process env in sync so child processes spawned after token change inherit it
     if (patch.hfToken !== undefined) {
@@ -891,7 +891,16 @@ export function setupIpcHandlers(pythonBridge: PythonBridge, getWindow: WindowGe
         runner = getProcessRunner(extensionId, extDir, entry, workspaceDir, app.getPath('temp'))
       }
 
-      const result = await runner.run(input, params)
+      let runParams = params
+      if (extensionId === 'stable-diffusion-webui') {
+        const { sdWebuiBaseUrl } = getSettings(userData)
+        const base = String(params.api_base_url ?? '').trim()
+          || String(sdWebuiBaseUrl ?? '').trim()
+          || 'http://127.0.0.1:7860'
+        runParams = { ...params, api_base_url: base }
+      }
+
+      const result = await runner.run(input, runParams)
       return { success: true, result }
     } catch (err) {
       return { success: false, error: String(err) }

@@ -3,12 +3,15 @@ import { Section, Card, Row } from '@shared/ui'
 
 export function IntegrationsSection(): JSX.Element {
   const [token,    setToken]    = useState('')
+  const [sdUrl,    setSdUrl]    = useState('http://127.0.0.1:7860')
   const [visible,  setVisible]  = useState(false)
   const [status,   setStatus]   = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [sdStatus, setSdStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
   useEffect(() => {
     window.electron.settings.get().then((s) => {
       setToken(s.hfToken ?? '')
+      setSdUrl(s.sdWebuiBaseUrl ?? 'http://127.0.0.1:7860')
     })
   }, [])
 
@@ -21,6 +24,18 @@ export function IntegrationsSection(): JSX.Element {
     } catch {
       setStatus('error')
       setTimeout(() => setStatus('idle'), 3000)
+    }
+  }
+
+  async function handleSaveSdUrl() {
+    setSdStatus('saving')
+    try {
+      await window.electron.settings.set({ sdWebuiBaseUrl: sdUrl.trim() || 'http://127.0.0.1:7860' })
+      setSdStatus('saved')
+      setTimeout(() => setSdStatus('idle'), 2500)
+    } catch {
+      setSdStatus('error')
+      setTimeout(() => setSdStatus('idle'), 3000)
     }
   }
 
@@ -101,6 +116,39 @@ export function IntegrationsSection(): JSX.Element {
                 {status === 'saving' ? 'Saving…' :
                  status === 'saved'  ? 'Saved'   :
                  status === 'error'  ? 'Failed'  :
+                 'Save'}
+              </button>
+            </div>
+          </Row>
+        </Card>
+
+        <Card
+          title="Stable Diffusion WebUI"
+          description="Automatic1111 API base URL for workflow txt2img / img2img nodes. WebUI must be started with --api."
+        >
+          <Row label="Base URL" description="Default used when a node leaves API URL empty.">
+            <div className="flex items-center gap-2 w-full">
+              <input
+                type="text"
+                value={sdUrl}
+                onChange={(e) => { setSdUrl(e.target.value); setSdStatus('idle') }}
+                onKeyDown={(e) => e.key === 'Enter' && handleSaveSdUrl()}
+                placeholder="http://127.0.0.1:7860"
+                spellCheck={false}
+                className="flex-1 px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-700/60 text-xs font-mono text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
+              />
+              <button
+                onClick={handleSaveSdUrl}
+                disabled={sdStatus === 'saving'}
+                className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50 ${
+                  sdStatus === 'saved' ? 'bg-emerald-500/15 text-emerald-400' :
+                  sdStatus === 'error' ? 'bg-red-500/15 text-red-400' :
+                  'bg-accent/15 hover:bg-accent/25 text-accent-light'
+                }`}
+              >
+                {sdStatus === 'saving' ? 'Saving…' :
+                 sdStatus === 'saved'  ? 'Saved'   :
+                 sdStatus === 'error'  ? 'Failed'  :
                  'Save'}
               </button>
             </div>

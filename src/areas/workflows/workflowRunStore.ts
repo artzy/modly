@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useAppStore } from '@shared/stores/appStore'
 import { getWorkflowExtension } from './mockExtensions'
 import type { WorkflowExtension } from './mockExtensions'
+import { vramHintIfNextIsModel, workflowOutputType } from './sdWorkflowUtils'
 import type { Workflow, WFNode, WFEdge } from '@shared/types/electron.d'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -293,11 +294,17 @@ export const useWorkflowRunStore = create<WorkflowRunStore>((set) => ({
           if (!result.success) throw new Error(result.error ?? 'Process extension failed')
           nodeInputPath = result.result?.filePath ?? nodeInputPath
           nodeInputText = result.result?.text     ?? nodeInputText
-          set((s) => ({ runState: { ...s.runState, blockProgress: 100, blockStep: 'Done' } }))
+          const vramHint = vramHintIfNextIsModel(
+            extId, execNodes, i, allExtensions,
+            (id) => getWorkflowExtension(id, allExtensions),
+          )
+          set((s) => ({
+            runState: { ...s.runState, blockProgress: 100, blockStep: vramHint ?? 'Done' },
+          }))
         }
 
         // Store output with type for downstream routing
-        const outputType = ext?.output ?? (nodeInputPath ? 'mesh' : undefined)
+        const outputType = workflowOutputType(ext, nodeInputPath)
         nodeOutputs.set(node.id, { filePath: nodeInputPath, text: nodeInputText, outputType })
 
         // If this node feeds an Add-to-Scene, push the mesh to currentJob

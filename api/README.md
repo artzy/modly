@@ -31,6 +31,8 @@ uvicorn main:app --host 127.0.0.1 --port 8765 --reload
 | POST | `/generate/from-image` | Start image-to-3D job |
 | GET | `/generate/status/{job_id}` | Poll job status |
 
+Workflow **Stable Diffusion WebUI** nodes call an external A1111 server; see [docs/sd-webui-api.md](../docs/sd-webui-api.md). Optional CLI chain: `node scripts/sd-chain.mjs --prompt "..." --model-id ext/node`.
+
 ## Model
 
 Default: **TripoSR** (`stabilityai/TripoSR`, ~2.4 GB)

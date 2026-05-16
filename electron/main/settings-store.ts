@@ -8,6 +8,8 @@ export interface AppSettings {
   extensionsDir:    string
   dependenciesDir:  string
   hfToken?:         string
+  /** Default Automatic1111 API base URL (no trailing slash). */
+  sdWebuiBaseUrl?:  string
 }
 
 function settingsPath(userData: string): string {
@@ -21,6 +23,7 @@ export function getSettings(userData: string): AppSettings {
     workflowsDir:     join(userData, 'workflows'),
     extensionsDir:    join(userData, 'extensions'),
     dependenciesDir:  join(userData, 'dependencies'),
+    sdWebuiBaseUrl:   'http://127.0.0.1:7860',
   }
 
   const file = settingsPath(userData)

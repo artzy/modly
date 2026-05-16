@@ -13,6 +13,7 @@
   },
   "include": [
     "src/areas/workflows/nodes/mesh-exporter/**/*.ts",
-    "src/areas/workflows/nodes/mesh-optimizer/**/*.ts"
+    "src/areas/workflows/nodes/mesh-optimizer/**/*.ts",
+    "src/areas/workflows/nodes/stable-diffusion-webui/**/*.ts"
   ]
 }
